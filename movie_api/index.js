@@ -27,7 +27,55 @@ app.get('/', (req, res) => {
     res.send('Welcome to my movie API!');
   });
 
-  app.use(express.static('public'));
+  //Endpoint to list all movies
+
+  app.get('/movies', (req, res) =>{
+    res.send('Successful GET Request returning data on ALL the movies.');
+  });
+ 
+  //Endpoint to add a new movie
+
+ app.post('/movies', (req, res) =>{
+  res.send('Successful POST Request adding new movies to the list');
+});
+ 
+//Endpoint to update details of movies by ID
+
+ app.put('/movies/:id', (req, res) =>{
+  res.send('Successfull PUT Request updating movies with ID: ${req.params.id}');
+});
+
+//End point to delete movies with specific ID
+app.delete('/movies/:id', (req, res) =>{
+  res.send('Successfull DELETE Request updating movies with ID: ${req.params.id}');
+});
+  
+// Endpoint to list all users
+app.get('/users', (req, res) => {
+  res.send('Successful GET request returning data on all the users');
+});
+
+// Endpoint to add a new user
+app.post('/users', (req, res) => {
+  res.send('Successful POST request adding a new user');
+});
+
+// Endpoint to get details of a specific user by ID
+app.get('/users/:id', (req, res) => {
+  res.send(`Successful GET request returning data on user with ID: ${req.params.id}`);
+});
+
+// Endpoint to update details of a specific user by ID
+app.put('/users/:id', (req, res) => {
+  res.send(`Successful PUT request updating user with ID: ${req.params.id}`);
+});
+
+// Endpoint to delete a specific user by ID
+app.delete('/users/:id', (req, res) => {
+  res.send(`Successful DELETE request deleting user with ID: ${req.params.id}`);
+});
+
+app.use(express.static('public'));
 
   app.use((err, req, res, next) =>{
     console.error(err.stack);
