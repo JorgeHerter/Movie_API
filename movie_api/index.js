@@ -1,11 +1,19 @@
-const express = require('express');
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true}));
+const express = require('./express');
 const mongoose = require('mongoose');
-const { Movie, User } = require('./models');
 const morgan = require('morgan');
+const { Movie, User } = require('./models');
+const passport = require('./passport');
+
+
 const app = express();
 
+const auth = require('./auth')(app);
+
+//middleware setup
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true}));
+app.use(morgan('dev'));
+app.use(passport.initialize());
 
 mongoose.connect('mongodb://localhost/mydatabase', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -14,7 +22,7 @@ mongoose.connect('mongodb://localhost/mydatabase', { useNewUrlParser: true, useU
   .catch((err) => {
     console.error('Error connecting to MongoDB:', err);
   });
-  app.use(morgan('dev'));
+  
 
   // Endpoint to list all movies
   app.get('/movies', async (req, res) => {
@@ -28,7 +36,7 @@ mongoose.connect('mongodb://localhost/mydatabase', { useNewUrlParser: true, useU
   });
   
   // Endpoint to add a new movie
-  app.post('/movies', async (req, res) => {
+  app.post('/movies', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
       const newMovie = new Movie(req.body);
       const savedMovie = await newMovie.save();
@@ -38,8 +46,7 @@ mongoose.connect('mongodb://localhost/mydatabase', { useNewUrlParser: true, useU
       res.status(500).send('Failed to add movie');
     }
   });
-  
-  // Define other routes for updating, deleting movies, and handling user-related operations
+
   
   // Define error handling middleware
   app.use((err, req, res, next) => {
@@ -47,6 +54,8 @@ mongoose.connect('mongodb://localhost/mydatabase', { useNewUrlParser: true, useU
     res.status(500).send('Something broke!');
   });
   
+  
+
   const PORT = 8080;
   
   app.listen(PORT, () => {
